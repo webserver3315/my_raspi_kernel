@@ -9,27 +9,6 @@
 #include <kernel/uart.h>
 #include <common/stdlib.h>
 
-// reg에 쓴다.
-// 절대주소를 써야하는데, 0x20000000 + peripheral base + register offset 넣어야 함
-static inline void mmio_write(uint32_t reg, uint32_t data)
-{
-    *(volatile uint32_t*)reg = data; // volatile: 컴파일러가 최적화하지 말라는 뜻.
-}
-
-static inline uint32_t mmio_read(uint32_t reg)
-{
-    return *(volatile uint32_t*)reg;
-}
-
-// Loop <delay> times in a way that the compiler won't optimize away
-// 그냥 시간낭비하는 함수
-// 구체적으로는 이해할 수 없어서, chat gpt에게 물어봄
-static inline void delay(int32_t count)
-{
-    asm volatile("__delay_%=: subs %[count], %[count], #1; bne __delay_%=\n"
-            : "=r"(count): [count]"0"(count) : "cc");
-}
-
 
 //
 // Setting up the Hardware
