@@ -1,0 +1,29 @@
+arm-none-eabi-gcc -mcpu=cortex-a7 -fpic -ffreestanding -c boot.S -o boot.o
+-mcpu=cortex-a7 // a7 프로세서의 ISA로 코드를 만들거야
+-fpic //
+-ffreestanding // 이건 main으로부터 시작한다는 보장 없는 코드야 
+-c boot.S // boot.S 어셈블해서(컴파일 옵션으로도 사용됨)
+-o boot.o // boot.o (기계어) 로 출력해라
+
+arm-none-eabi-gcc -mcpu=cortex-a7 -fpic -ffreestanding -std=gnu99 -c kernel.c -o kernel.o -O2 -Wall -Wextra
+-std=gnu99 // gnu99 사용
+-O2 // 만들어지는 코드가 최대한 빠르게 수행되도록, 그러나 너무 비대해지지는 않게
+-Wall // Warning All. 즉, 모든 모호한 코딩에 경고를 띄워라
+-Wextra // -Wall에 의해  활성화되지않는 추가적인 warning flag도 활성화해라
+
+arm-none-eabi-gcc -T linker.ld -o myos.elf -ffreestanding -O2 -nostdlib boot.o kernel.o
+arm-none-eabi-gcc 
+-T // 뒤따르는 script(linker.ld)를 linker script로 사용해라. 특히 베어본에선 반드시 필요하다. reference to undefined symbol을 막기 위해서 말이다.
+-nostdlib // link시에 libc 사용하지 말라. Startup 파일 없이 오로지 내가 linker에 넘긴 라이브러리만 사용하라.
+linker.ld 
+-o 
+myos.elf 
+boot.o 
+kernel.o
+
+qemu-system-aarch64 -m 1024 -M raspi2b -serial stdio -kernel myos.elf
+qemu-system-aarch64 
+-m 1024 // memory: 1GB
+-M raspi2b // Machine: raspi2b
+-serial stdio //serial port를 stdio로 연결
+-kernel myos.elf // 커널 이미지는 myos.elf
